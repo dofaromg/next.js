@@ -465,6 +465,15 @@ export interface ExperimentalConfig {
   turbopackRemoveUnusedExports?: boolean
 
   /**
+   * Enable local analysis to infer side effect free modules. When enabled, Turbopack will
+   * analyze module code to determine if it has side effects. This can improve tree shaking
+   * and bundle size at the cost of some additional analysis.
+   *
+   * Defaults to `true`.
+   */
+  turbopackInferModuleSideEffects?: boolean
+
+  /**
    * Use the system-provided CA roots instead of bundled CA roots for external HTTPS requests
    * made by Turbopack. Currently this is only used for fetching data from Google Fonts.
    *
@@ -836,6 +845,14 @@ export interface ExperimentalConfig {
    * @default false
    */
   hideLogsAfterAbort?: boolean
+
+  /**
+   * Whether `process.env.NEXT_DEPLOYMENT_ID` is available at runtime in the server (and `next
+   * build` doesn't need to embed the deployment ID value into the build output).
+   *
+   * @default false
+   */
+  runtimeServerDeploymentId?: boolean
 }
 
 export type ExportPathMap = {
@@ -1586,8 +1603,8 @@ export async function normalizeConfig(phase: string, config: any) {
 //   };
 // };
 export interface NextConfigRuntime {
-  // TODO remove in some cases
-  deploymentId: NextConfigComplete['deploymentId']
+  // Can be undefined, particularly when experimental.runtimeServerDeploymentId is true
+  deploymentId?: NextConfigComplete['deploymentId']
 
   configFileName?: string
   // Should only be included when using isExperimentalCompile
@@ -1652,6 +1669,7 @@ export interface NextConfigRuntime {
     | 'proxyClientMaxBodySize'
     | 'proxyTimeout'
     | 'testProxy'
+    | 'runtimeServerDeploymentId'
   > & {
     // Pick on @internal fields generates invalid .d.ts files
     /** @internal */
@@ -1706,6 +1724,7 @@ export function getNextConfigRuntime(
         proxyClientMaxBodySize: ex.proxyClientMaxBodySize,
         proxyTimeout: ex.proxyTimeout,
         testProxy: ex.testProxy,
+        runtimeServerDeploymentId: ex.runtimeServerDeploymentId,
 
         trustHostHeader: ex.trustHostHeader,
         isExperimentalCompile: ex.isExperimentalCompile,
@@ -1713,7 +1732,9 @@ export function getNextConfigRuntime(
     : {}
 
   let runtimeConfig: Requiredish<NextConfigRuntime> = {
-    deploymentId: config.deploymentId,
+    deploymentId: config.experimental.runtimeServerDeploymentId
+      ? ''
+      : config.deploymentId,
 
     configFileName: undefined,
     env: undefined,
