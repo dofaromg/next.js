@@ -9,6 +9,6 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "next": "15.5.8"
+    "next": "15.5.9"
   }
 }
