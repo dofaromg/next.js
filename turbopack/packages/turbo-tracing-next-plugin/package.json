@@ -17,7 +17,7 @@
     "next": ">= 12"
   },
   "devDependencies": {
-    "next": "15.5.8"
+    "next": "15.5.9"
   },
   "scripts": {
     "lint": "eslint src/",

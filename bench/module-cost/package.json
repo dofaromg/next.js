@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "rimraf": "6.0.1",
-    "next": "15.5.8",
+    "next": "15.5.9",
     "playwright": "^1.40.0"
   }
 }
